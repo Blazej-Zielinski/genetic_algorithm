@@ -1,13 +1,11 @@
-from src.models.chromosome import Chromosome
-from src.models.member import Member
 
-chr1 = Chromosome([-10, 10], 6)
-chr2 = Chromosome([-10, 10], 6)
-member = Member([chr1, chr2])
+from src.models.population import Population
 
-# print(chr1.binary_arr)
-# print(chr1.calculate_decimal())
 
-print(chr1.calculate_decimal())
-print(chr2.calculate_decimal())
-print(member.calculate_fitness_fun())
+population = Population()
+population.best_selection(32)
+population.tournament_selection(20)
+
+population.homogeneous_crossover(0.25)
+
+child = population.multipoint_crossover(population.members[1], population.members[5], 2)

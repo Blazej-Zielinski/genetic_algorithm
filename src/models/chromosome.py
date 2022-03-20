@@ -3,7 +3,7 @@ import math
 
 
 class Chromosome:
-    def __init__(self, interval=None, precision=None):
+    def __init__(self, interval, precision):
         self.interval = interval
         self.precision = precision
         self.binary_arr = np.random.randint(2, size=(self.__calculate_length(),))

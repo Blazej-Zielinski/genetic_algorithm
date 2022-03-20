@@ -3,9 +3,10 @@ import math
 
 
 class Member:
-    def __init__(self, chromosomes):
-        self.x1: Chromosome = chromosomes[0]
-        self.x2: Chromosome = chromosomes[1]
+    def __init__(self, interval, precision):
+        self.x1: Chromosome = Chromosome(interval, precision)
+        self.x2: Chromosome = Chromosome(interval, precision)
+        self.fitness_value = self.calculate_fitness_fun()
 
     def calculate_fitness_fun(self):
         x1_val = self.x1.calculate_decimal()
