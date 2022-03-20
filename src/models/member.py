@@ -13,3 +13,9 @@ class Member:
         x2_val = self.x2.calculate_decimal()
 
         return math.pow(x1_val + 2 * x2_val - 7, 2) + math.pow(2 * x1_val + x2_val - 5, 2)
+
+    def update_fitness_value(self):
+        self.fitness_value = self.calculate_fitness_fun()
+
+    def __str__(self):
+        return f"[{self.x1.calculate_decimal()} ; {self.x2.calculate_decimal()} ; {self.fitness_value}]"
