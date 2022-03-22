@@ -1,6 +1,7 @@
 from src.models.member import Member
 import math
 
+
 # TODO move to contants.py?
 global_minimum = 0.0
 
