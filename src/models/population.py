@@ -61,33 +61,46 @@ class Population:
     # crossover
     def multipoint_crossover(self, parent1: Member, parent2: Member, crossover_points_number: int):
         x1_crossover_points = sorted(np.random.choice(
-            np.arange(0, parent1.x1.binary_arr.size),
+            np.arange(0, parent1.x1.binary_arr.size - 1),
             replace=False,
             size=crossover_points_number))
         x2_crossover_points = sorted(np.random.choice(
-            np.arange(0, parent1.x2.binary_arr.size),
+            np.arange(0, parent1.x2.binary_arr.size - 1),
             replace=False,
             size=crossover_points_number))
 
-        child = self.create_child()
-        child.x1.binary_arr = parent1.x1.binary_arr.copy()
-        child.x2.binary_arr = parent1.x2.binary_arr.copy()
+        child1, child2 = self.create_child(), self.create_child()
+
+        child1.x1.binary_arr = parent1.x1.binary_arr.copy()
+        child1.x2.binary_arr = parent1.x2.binary_arr.copy()
+
+        child2.x1.binary_arr = parent2.x1.binary_arr.copy()
+        child2.x2.binary_arr = parent2.x2.binary_arr.copy()
 
         for x1_crossover_point in x1_crossover_points:
-            child.x1.binary_arr = np.concatenate((
-                child.x1.binary_arr[:x1_crossover_point],
+            child1.x1.binary_arr = np.concatenate((
+                child1.x1.binary_arr[:x1_crossover_point],
                 parent2.x1.binary_arr[x1_crossover_point:]),
+                axis=None)
+            child2.x1.binary_arr = np.concatenate((
+                child2.x1.binary_arr[:x1_crossover_point],
+                parent1.x1.binary_arr[x1_crossover_point:]),
                 axis=None)
 
         for x2_crossover_point in x2_crossover_points:
-            child.x2.binary_arr = np.concatenate((
-                child.x2.binary_arr[:x2_crossover_point],
+            child1.x2.binary_arr = np.concatenate((
+                child1.x2.binary_arr[:x2_crossover_point],
                 parent2.x2.binary_arr[x2_crossover_point:]),
                 axis=None)
+            child2.x2.binary_arr = np.concatenate((
+                child2.x2.binary_arr[:x2_crossover_point],
+                parent1.x2.binary_arr[x2_crossover_point:]),
+                axis=None)
 
-        child.update_fitness_value()
+        child1.update_fitness_value()
+        child2.update_fitness_value()
 
-        return child
+        return child1, child2
 
     def homogeneous_crossover(self, probability: float):
         if not (1 >= probability >= 0):
@@ -98,7 +111,8 @@ class Population:
         p2_chromosome_x1, p2_chromosome_x2 = parent2.x1, parent2.x2
         nr_of_bits = len(p1_chromosome_x1.binary_arr)
 
-        ch_chromosome_x1_bin_arr, ch_chromosome_x2_bin_arr = p1_chromosome_x1.binary_arr.copy(), p1_chromosome_x2.binary_arr.copy()
+        ch1_chromosome_x1_bin_arr, ch1_chromosome_x2_bin_arr = p1_chromosome_x1.binary_arr.copy(), p1_chromosome_x2.binary_arr.copy()
+        ch2_chromosome_x1_bin_arr, ch2_chromosome_x2_bin_arr = p2_chromosome_x1.binary_arr.copy(), p2_chromosome_x2.binary_arr.copy()
 
         for idx in range(nr_of_bits):
             random_value_for_x1 = random.random()
@@ -106,18 +120,99 @@ class Population:
 
             # success mutation
             if random_value_for_x1 <= probability:
-                ch_chromosome_x1_bin_arr[idx] = p2_chromosome_x1.binary_arr[idx]
+                temp = ch1_chromosome_x1_bin_arr[idx]
+                ch1_chromosome_x1_bin_arr[idx] = ch2_chromosome_x1_bin_arr[idx]
+                ch2_chromosome_x1_bin_arr[idx] = temp
 
+            # success mutation
             if random_value_for_x2 <= probability:
-                ch_chromosome_x2_bin_arr[idx] = p2_chromosome_x2.binary_arr[idx]
+                temp = ch1_chromosome_x2_bin_arr[idx]
+                ch1_chromosome_x2_bin_arr[idx] = ch2_chromosome_x2_bin_arr[idx]
+                ch2_chromosome_x2_bin_arr[idx] = temp
 
-        child = self.create_child()
-        child.x1.binary_arr = ch_chromosome_x1_bin_arr
-        child.x2.binary_arr = ch_chromosome_x2_bin_arr
-        child.update_fitness_value()
+        child1, child2 = self.create_child(), self.create_child()
 
-        # print(f"parent1: {parent1} : {parent1.x1.binary_arr} {parent1.x2.binary_arr}")
-        # print(f"parent2: {parent2} : {parent2.x1.binary_arr} {parent1.x2.binary_arr}")
-        # print(f"child: {child} : {child.x1.binary_arr} {child.x2.binary_arr}")
+        child1.x1.binary_arr = ch1_chromosome_x1_bin_arr
+        child1.x2.binary_arr = ch1_chromosome_x2_bin_arr
+        child1.update_fitness_value()
 
-        return child
+        child2.x1.binary_arr = ch2_chromosome_x1_bin_arr
+        child2.x2.binary_arr = ch2_chromosome_x2_bin_arr
+        child2.update_fitness_value()
+
+        return child1, child2
+
+    def boundary_mutation(self, member: Member, probability: float):
+        if not (1 >= probability >= 0):
+            return
+
+        which_boundary = random.randint(0, 1)
+
+        generated_probability = random.random()
+        if generated_probability <= probability:
+            if which_boundary:
+                member.x1.binary_arr[member.x1.binary_arr.size - 1] ^= 1
+            else:
+                member.x1.binary_arr[0] ^= 1
+
+        generated_probability = random.random()
+        if generated_probability <= probability:
+            if which_boundary:
+                member.x2.binary_arr[member.x1.binary_arr.size - 1] ^= 1
+            else:
+                member.x2.binary_arr[0] ^= 1
+
+        member.update_fitness_value()
+
+    def multipoint_mutation(self, member: Member, probability: float, mutation_points_number: int):
+        if not (1 >= probability >= 0):
+            return
+
+        x1_mutation_points = sorted(np.random.choice(
+            np.arange(0, member.x1.binary_arr.size - 1),
+            replace=False,
+            size=mutation_points_number))
+
+        x2_mutation_points = sorted(np.random.choice(
+            np.arange(0, member.x2.binary_arr.size - 1),
+            replace=False,
+            size=mutation_points_number))
+
+        generated_probability = random.random()
+        if generated_probability <= probability:
+            for mutation_point in x1_mutation_points:
+                member.x1.binary_arr[mutation_point] ^= 1
+
+        generated_probability = random.random()
+        if generated_probability <= probability:
+            for mutation_point in x2_mutation_points:
+                member.x2.binary_arr[mutation_point] ^= 1
+
+    def inversion(self, member: Member):
+        x1_crossover_points = sorted(np.random.choice(
+            np.arange(0, member.x1.binary_arr.size - 1),
+            replace=False,
+            size=2))
+
+        x2_crossover_points = sorted(np.random.choice(
+            np.arange(0, member.x1.binary_arr.size - 1),
+            replace=False,
+            size=2))
+
+        # Inversion for x1
+        for x1_crossover_point in range(x1_crossover_points[0], x1_crossover_points[1]):
+            member.x1.binary_arr[x1_crossover_point] = 1 - member.x1.binary_arr[x1_crossover_point]
+
+        # Inversion for x2
+        for x2_crossover_point in range(x2_crossover_points[0], x2_crossover_points[1]):
+            member.x2.binary_arr[x2_crossover_point] = 1 - member.x2.binary_arr[x2_crossover_point]
+
+    def elite_strategy(self, percentage: int):
+        if not (100 >= percentage >= 0):
+            return
+
+        # Nr of elite members
+        elite_members_nr = math.ceil(self.size * (percentage / 100))
+        sorted_members = sorted(self.members, key=cmp_to_key(compare_members))
+
+        return sorted_members[:elite_members_nr]

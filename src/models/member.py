@@ -4,6 +4,7 @@ import math
 
 class Member:
     def __init__(self, interval, precision):
+        # Todo array of chromosomes to avoid code duplication
         self.x1: Chromosome = Chromosome(interval, precision)
         self.x2: Chromosome = Chromosome(interval, precision)
         self.fitness_value = self.calculate_fitness_fun()
