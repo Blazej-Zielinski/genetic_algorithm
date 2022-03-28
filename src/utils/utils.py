@@ -13,3 +13,10 @@ def compare_members(member1: Member, member2: Member):
         return 0
     else:
         return -1
+
+
+def write_to_file(data):
+    pass
+
+def draw_plot(data):
+    pass
