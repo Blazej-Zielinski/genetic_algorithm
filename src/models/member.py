@@ -5,7 +5,7 @@ from src.models.chromosome import Chromosome
 
 class Member:
     def __init__(self, interval, precision):
-        self.chromosomes = np.array([Chromosome(interval, precision) for i in range(2)])
+        self.chromosomes = np.array([Chromosome(interval, precision) for _ in range(2)])
         self.fitness_value = self.calculate_fitness_fun()
 
     def calculate_fitness_fun(self):

@@ -22,6 +22,7 @@ class Population:
         result = sorted(self.members, key=cmp_to_key(compare_members))
         number_of_selected_members = math.ceil(self.size * percentage / 100)
 
+        self.members = result[:number_of_selected_members]
         return result[:number_of_selected_members]
 
     def roulette_wheel_selection(self, percentage: int):
@@ -50,7 +51,7 @@ class Population:
             winner = min(tournaments[idx], key=lambda member: member.fitness_value)
             winners.append(winner)
 
-        # todo self.members = winners ( czy wyrzuca sie tych co nie zostali wybrani)
+        self.members = winners
         return winners
 
     def multipoint_crossover(self, parent1: Member, parent2: Member, crossover_points_number: int):
@@ -134,7 +135,11 @@ class Population:
                 for mutation_point in mutation_points:
                     member.chromosomes[i].binary_arr[mutation_point] ^= 1
 
-    def inversion(self, member: Member):
+        member.update_fitness_value()
+
+    def inversion(self, member: Member, probability: float):
+        if not random.random() <= probability:
+            return
 
         for i in range(0, member.chromosomes.size):
             inversion_points = sorted(np.random.choice(
@@ -145,6 +150,8 @@ class Population:
             for inversion_point in range(inversion_points[0], inversion_points[1]):
                 member.chromosomes[i].binary_arr[inversion_point] ^= 1
 
+        member.update_fitness_value()
+
     def elite_strategy(self, percentage: int):
         if not (100 >= percentage >= 0):
             return
@@ -152,5 +159,8 @@ class Population:
         # Nr of elite members
         elite_members_nr = math.ceil(self.size * (percentage / 100))
         sorted_members = sorted(self.members, key=cmp_to_key(compare_members))
+
+        # Delete elite members from self.members
+        self.members = [member for member in self.members if member not in sorted_members[:elite_members_nr]]
 
         return sorted_members[:elite_members_nr]

@@ -1,6 +1,8 @@
 from _operator import pow
 from enum import Enum
 
+default_values = [20, 20, 1, 1, 1, -10, 10, 6, 100, 1]
+
 
 class Crossover(Enum):
     SINGLE_POINT = 'single point'
@@ -34,6 +36,8 @@ class Variables(Enum):
     POPULATION_SIZE = 'population size:'
     EPOCH_AMOUNT = 'epoch amount:'
 
+
+class GenAlgorithms(Enum):
     SELECTION = 'selection'
     MUTATION = 'mutation'
     CROSSOVER = 'crossover'
@@ -68,40 +72,40 @@ class Config(metaclass=Singleton):
 
     def with_crossover(self, crossover: Crossover, probability: float):
         self.crossover = crossover.get()
-        self.crossover_probability = probability.get()
+        self.crossover_probability = float(probability.get())
         return self
 
     def with_selection(self, selection: Selection, percent: int):
         self.selection = selection.get()
-        self.percent_of_selected = percent.get()
+        self.percent_of_selected = int(percent.get())
         return self
 
     def with_mutation(self, mutation: Mutation, probability: float):
         self.mutation = mutation.get()
-        self.mutation_probability = probability.get()
+        self.mutation_probability = float(probability.get())
         return self
 
     def with_inversion(self, probability: float):
-        self.inversion_probability = probability.get()
+        self.inversion_probability = float(probability.get())
         return self
 
     def with_elite_strategy(self, percent: int):
-        self.percent_of_elite = percent.get()
+        self.percent_of_elite = int(percent.get())
         return self
 
     def with_interval(self, left_interval_endpoint: float, right_interval_endpoint: float):
-        self.interval = [left_interval_endpoint.get(), right_interval_endpoint.get()]
+        self.interval = [float(left_interval_endpoint.get()), float(right_interval_endpoint.get())]
         return self
 
     def with_chromosome_prec(self, chromosome_prec: int):
-        self.chromosome_precision = chromosome_prec.get()
+        self.chromosome_precision = int(chromosome_prec.get())
         return self
 
     def with_population_size(self, population_size: int):
-        self.population_size = population_size.get()
+        self.population_size = int(population_size.get())
         return self
 
     def with_epoch_amount(self, epoch_amount: int):
-        self.epoch_amount = epoch_amount.get()
+        self.epoch_amount = int(epoch_amount.get())
         return self
 
