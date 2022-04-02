@@ -153,8 +153,8 @@ class Population:
         member.update_fitness_value()
 
     def elite_strategy(self, percentage: int):
-        if not (100 >= percentage >= 0):
-            return
+        if percentage > 100 or percentage <= 0:
+            return []
 
         # Nr of elite members
         elite_members_nr = math.ceil(self.size * (percentage / 100))

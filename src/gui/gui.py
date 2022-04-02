@@ -60,7 +60,7 @@ class GeneticAlgorithmInterface(tk.Frame):
             variables[label] = var
 
         # Button
-        tk.Button(self.__main_window, command=lambda: configure_and_start_algorithm(variables), text="press me").pack()
+        tk.Button(self.__main_window, command=lambda: configure_and_start_algorithm(variables), text="Start").pack()
 
 
 def configure_and_start_algorithm(variables):

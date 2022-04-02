@@ -1,7 +1,6 @@
-from _operator import pow
 from enum import Enum
 
-default_values = [20, 20, 1, 1, 1, -10, 10, 6, 100, 1]
+default_values = [20, 20, 0.1, 0.1, 0, -10, 10, 6, 100, 1000]
 
 
 class Crossover(Enum):
