@@ -15,6 +15,15 @@ def compare_members(member1: Member, member2: Member):
         return -1
 
 
+def compare_members(member1: Member, member2: Member):
+    if math.fabs(member1.fitness_value - global_minimum) > math.fabs(member2.fitness_value - global_minimum):
+        return 1
+    if math.fabs(member1.fitness_value - global_minimum) == math.fabs(member2.fitness_value - global_minimum):
+        return 0
+    else:
+        return -1
+
+
 def write_to_file(data):
     pass
 

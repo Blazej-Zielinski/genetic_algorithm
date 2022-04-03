@@ -1,6 +1,6 @@
 import pprint
 import tkinter as tk
-from src.algorithm.conf import Crossover, Mutation, Selection, Variables, Config, GenAlgorithms, default_values
+from src.algorithm.conf import Crossover, Mutation, Selection, Variables, Config, GenAlgorithms, default_values, OptimizationType
 from src.algorithm.algorithm import Algorithm
 
 
@@ -17,39 +17,26 @@ class GeneticAlgorithmInterface(tk.Frame):
 
         variables = dict()
 
-        # Dropbox
+        # Dropbox inputs
+        gen_alg_enum = [e.value for e in GenAlgorithms]
+        optimization_enum = [e.value for e in OptimizationType]
         selection_enum = [e.value for e in Selection]
         cross_enum = [e.value for e in Crossover]
         mutation_enum = [e.value for e in Mutation]
 
-        selection_frame = tk.Frame(self.__main_window)
-        tk.Label(selection_frame, text=GenAlgorithms.SELECTION.value).grid(row=0, column=0)
-        selection_var = tk.StringVar()
-        selection_var.set(selection_enum[0])
-        selection_dialog = tk.OptionMenu(selection_frame, selection_var, *selection_enum)
-        selection_dialog.grid(row=0, column=1)
-        selection_frame.pack()
-        variables[GenAlgorithms.SELECTION.value] = selection_var
+        dropdown_variables = [optimization_enum, selection_enum, mutation_enum, cross_enum]
 
-        cross_frame = tk.Frame(self.__main_window)
-        tk.Label(cross_frame, text=GenAlgorithms.CROSSOVER.value).grid(row=0, column=0)
-        cross_var = tk.StringVar()
-        cross_var.set(cross_enum[0])
-        cross_dialog = tk.OptionMenu(cross_frame, cross_var, *cross_enum)
-        cross_dialog.grid(row=0, column=1)
-        cross_frame.pack()
-        variables[GenAlgorithms.CROSSOVER.value] = cross_var
+        for idx, enum in enumerate(dropdown_variables):
+            frame = tk.Frame(self.__main_window)
+            tk.Label(frame, text=gen_alg_enum[idx]).grid(row=0, column=0)
+            var = tk.StringVar()
+            var.set(enum[0])
+            dialog = tk.OptionMenu(frame, var, *enum)
+            dialog.grid(row=0, column=1)
+            frame.pack()
+            variables[gen_alg_enum[idx]] = var
 
-        mutation_frame = tk.Frame(self.__main_window)
-        tk.Label(mutation_frame, text=GenAlgorithms.MUTATION.value).grid(row=0, column=0)
-        mutation_var = tk.StringVar()
-        mutation_var.set(mutation_enum[0])
-        mutation_dialog = tk.OptionMenu(mutation_frame, mutation_var, *mutation_enum)
-        mutation_dialog.grid(row=0, column=1)
-        mutation_frame.pack()
-        variables[GenAlgorithms.MUTATION.value] = mutation_var
-
-        # Inputs
+        # Entry inputs
         variables_labels = [e.value for e in Variables]
         for idx, label in enumerate(variables_labels):
             fr = tk.Frame(self.__main_window)
@@ -65,14 +52,15 @@ class GeneticAlgorithmInterface(tk.Frame):
 
 def configure_and_start_algorithm(variables):
     try:
-        config = Config().with_epoch_amount(variables[Variables.EPOCH_AMOUNT.value])\
+        config = Config().with_optimization(variables[GenAlgorithms.OPTIMIZATION.value])\
+            .with_epoch_amount(variables[Variables.EPOCH_AMOUNT.value])\
             .with_population_size(variables[Variables.POPULATION_SIZE.value])\
             .with_inversion(variables[Variables.INVERSION_PROBABILITY.value])\
             .with_elite_strategy(variables[Variables.PERCENTAGE_ELITE.value])\
             .with_interval(variables[Variables.LEFT_INTERVAL_ENDPOINT.value], variables[Variables.RIGHT_INTERVAL_ENDPOINT.value]) \
             .with_crossover(variables[GenAlgorithms.CROSSOVER.value], variables[Variables.CROSS_PROBABILITY.value])\
             .with_mutation(variables[GenAlgorithms.MUTATION.value], variables[Variables.MUTATION_PROBABILITY.value])\
-            .with_selection(variables[GenAlgorithms.SELECTION.value], variables[Variables.SELECTION_PROBABILITY.value])\
+            .with_selection(variables[GenAlgorithms.SELECTION.value], variables[Variables.SELECTION_PERCENTAGE.value])\
             .with_chromosome_prec(variables[Variables.CHROMOSOME_PRECISION.value])
     except:
         print("Bad config")

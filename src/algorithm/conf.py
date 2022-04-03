@@ -1,29 +1,34 @@
 from enum import Enum
 
-default_values = [20, 20, 0.1, 0.1, 0, -10, 10, 6, 100, 1000]
+default_values = [20, 0.2, 0.1, 0.1, 0, -10, 10, 6, 100, 1000]
+
+
+class OptimizationType(Enum):
+    MAXIMIZATION = 'maximization'
+    MINIMIZATION = 'minimization'
 
 
 class Crossover(Enum):
-    SINGLE_POINT = 'single point'
-    TWO_POINT = 'two point'
-    THREE_POINT = 'three point'
+    SINGLE_POINT = 'single-point'
+    TWO_POINT = 'two-point'
+    THREE_POINT = 'three-point'
     HOMOGENEOUS = 'homogeneous'
 
 
 class Selection(Enum):
     BEST = 'best'
-    ROULETTE_WHEEL = 'roulette wheel'
+    ROULETTE_WHEEL = 'roulette-wheel'
     TOURNAMENT = 'tournament'
 
 
 class Mutation(Enum):
     BOUNDARY = 'boundary'
-    SINGLE_POINT = 'single point'
-    TWO_POINT = 'two point'
+    SINGLE_POINT = 'single-point'
+    TWO_POINT = 'two-point'
 
 
 class Variables(Enum):
-    SELECTION_PROBABILITY = 'selection prob:'
+    SELECTION_PERCENTAGE = 'selection percentage / tournament size:'
     CROSS_PROBABILITY = 'cross prob:'
     MUTATION_PROBABILITY = 'mutation prob:'
     INVERSION_PROBABILITY = 'inversion prob:'
@@ -37,6 +42,7 @@ class Variables(Enum):
 
 
 class GenAlgorithms(Enum):
+    OPTIMIZATION = 'optimization'
     SELECTION = 'selection'
     MUTATION = 'mutation'
     CROSSOVER = 'crossover'
@@ -53,6 +59,8 @@ class Singleton(type):
 
 class Config(metaclass=Singleton):
     def __init__(self):
+        # optimization
+        self.optimization = None
         # chromosome config
         self.interval = None
         self.chromosome_precision = None
@@ -68,6 +76,10 @@ class Config(metaclass=Singleton):
         self.mutation_probability = None
         self.inversion_probability = None
         self.percent_of_elite = None
+
+    def with_optimization(self, optimization: OptimizationType):
+        self.optimization = optimization.get()
+        return self
 
     def with_crossover(self, crossover: Crossover, probability: float):
         self.crossover = crossover.get()
