@@ -1,4 +1,3 @@
-import pprint
 import tkinter as tk
 from src.algorithm.conf import Crossover, Mutation, Selection, Variables, Config, GenAlgorithms, default_values, OptimizationType
 from src.algorithm.algorithm import Algorithm

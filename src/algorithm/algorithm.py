@@ -61,7 +61,6 @@ class Algorithm:
                 Selection.TOURNAMENT.value: lambda: population.tournament_selection(self.config.percent_of_selected),
                 Selection.ROULETTE_WHEEL.value: lambda: population.roulette_wheel_selection(self.config.percent_of_selected)
             }[self.config.selection]()
-            # print(f"After Selection: {len(population.members)}")
 
             # Crossover
             children = []
@@ -79,7 +78,6 @@ class Algorithm:
                 children.pop()
 
             population.members += children
-            # print(f"After Crossover: {len(population.members)}")
 
             # Mutation
             for i in range(len(population.members)):
@@ -88,12 +86,10 @@ class Algorithm:
                     Mutation.TWO_POINT.value: lambda: population.multipoint_mutation(population.members[i], self.config.mutation_probability, 2),
                     Mutation.BOUNDARY.value: lambda: population.boundary_mutation(population.members[i], self.config.mutation_probability)
                 }[self.config.mutation]()
-            # print(f"After Mutation: {len(population.members)}")
 
             # Inversion
             for i in range(len(population.members)):
                 population.inversion(population.members[i], self.config.inversion_probability)
-            # print(f"After Inversion: {len(population.members)}")
 
             # Adding elite member
             population.members += elite_members

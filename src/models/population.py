@@ -17,7 +17,6 @@ class Population:
         self.interval = interval
         self.precision = precision
 
-    # TODO TEMP
     def create_child(self):
         return Member(self.interval, self.precision)
 
