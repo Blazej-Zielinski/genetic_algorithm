@@ -11,7 +11,7 @@ class GeneticAlgorithmInterface(tk.Frame):
         self.configure_main_window()
 
     def configure_main_window(self):
-        self.__main_window.geometry('600x400')
+        self.__main_window.geometry('400x400')
         self.__main_window.resizable(False, False)
         self.__main_window.title("Genetic Algorithm")
 
@@ -28,12 +28,13 @@ class GeneticAlgorithmInterface(tk.Frame):
 
         for idx, enum in enumerate(dropdown_variables):
             frame = tk.Frame(self.__main_window)
-            tk.Label(frame, text=gen_alg_enum[idx]).grid(row=0, column=0)
+            tk.Label(frame, text=gen_alg_enum[idx]).pack(side=tk.LEFT, padx=(10, 0))
             var = tk.StringVar()
             var.set(enum[0])
             dialog = tk.OptionMenu(frame, var, *enum)
-            dialog.grid(row=0, column=1)
-            frame.pack()
+            dialog.config(width=15)
+            dialog.pack(side=tk.RIGHT, padx=(0, 10))
+            frame.pack(fill=tk.X)
             variables[gen_alg_enum[idx]] = var
 
         # Entry inputs
@@ -41,13 +42,15 @@ class GeneticAlgorithmInterface(tk.Frame):
         for idx, label in enumerate(variables_labels):
             fr = tk.Frame(self.__main_window)
             var = tk.StringVar(value=default_values[idx])
-            tk.Label(fr, text=label).grid(row=idx, column=0)
-            tk.Entry(fr, textvariable=var).grid(row=idx, column=1)
-            fr.pack()
+            tk.Label(fr, text=label).pack(side=tk.LEFT, padx=(10, 0))
+            tk.Entry(fr, textvariable=var).pack(side=tk.RIGHT, fill=tk.X, padx=(0, 10))
+            fr.pack(fill=tk.X)
             variables[label] = var
 
         # Button
-        tk.Button(self.__main_window, command=lambda: configure_and_start_algorithm(variables), text="Start").pack()
+        button = tk.Button(self.__main_window, command=lambda: configure_and_start_algorithm(variables), text="Start")
+        button.config(width=40)
+        button.pack(pady=(10, 0))
 
 
 def configure_and_start_algorithm(variables):
