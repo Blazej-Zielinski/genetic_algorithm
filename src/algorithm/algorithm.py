@@ -65,7 +65,7 @@ class Algorithm:
             # Crossover
             children = []
             while len(population.members) + len(children) + len(elite_members) < population.size:
-                parents = random.sample(population.members, 2)
+                parents = random.sample(population.members + elite_members, 2)
                 children += {
                     Crossover.SINGLE_POINT.value: lambda: population.multipoint_crossover(parents[0], parents[1], self.config.crossover_probability, 1),
                     Crossover.TWO_POINT.value: lambda: population.multipoint_crossover(parents[0], parents[1], self.config.crossover_probability, 2),

@@ -44,7 +44,7 @@ class Population:
         return selected_members
 
     def tournament_selection(self, tournament_size: int):
-        iterations = math.ceil(self.size / tournament_size)
+        iterations = math.floor(len(self.members) / tournament_size)
         tournaments = []
         winners = []
         members_copy = self.members.copy()
@@ -53,6 +53,9 @@ class Population:
             tournaments.append(random.sample(members_copy, tournament_size))
             # remove all elements that occur in one list form another
             members_copy = [member for member in members_copy if member not in tournaments[idx]]
+
+        if len(members_copy) > 0:
+            tournaments.append(random.sample(members_copy, len(members_copy)))
 
         # getting winners
         for idx in range(len(tournaments)):

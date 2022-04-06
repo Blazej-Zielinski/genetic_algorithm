@@ -1,11 +1,11 @@
 from enum import Enum
 
-default_values = [20, 0.2, 0.1, 0.1, 0, -10, 10, 6, 100, 1000]
+default_values = [60, 0.5, 0.02, 0, 10, -10, 10, 6, 100, 1000]
 
 
 class OptimizationType(Enum):
     MAXIMIZATION = 'maximization'
-    MINIMIZATION = 'minimization'
+    MINIMIZATION = 'minimization'sd
 
 
 class Crossover(Enum):
