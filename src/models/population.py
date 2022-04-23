@@ -7,18 +7,20 @@ from src.utils.utils import compare_members
 from src.algorithm.conf import OptimizationType
 
 
+# TODO find way to separate methods for real and classic chromosomes
 class Population:
-    def __init__(self, interval, precision, size, optimization):
+    def __init__(self, interval, precision, chromosome_type, size, optimization):
         self.size = size
-        self.members = [Member(interval, precision) for _ in range(self.size)]
+        self.members = [Member(interval, precision, chromosome_type) for _ in range(self.size)]
         self.optimization = optimization
 
         # chromosome config
         self.interval = interval
         self.precision = precision
+        self.chromosome_type = chromosome_type
 
     def create_child(self):
-        return Member(self.interval, self.precision)
+        return Member(self.interval, self.precision, self.chromosome_type)
 
     def best_selection(self, percentage: int):
         if not (100 >= percentage >= 0):

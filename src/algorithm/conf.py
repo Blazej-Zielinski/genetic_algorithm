@@ -5,7 +5,7 @@ default_values = [60, 0.5, 0.02, 0, 10, -10, 10, 6, 100, 1000]
 
 class OptimizationType(Enum):
     MAXIMIZATION = 'maximization'
-    MINIMIZATION = 'minimization'sd
+    MINIMIZATION = 'minimization'
 
 
 class Crossover(Enum):
