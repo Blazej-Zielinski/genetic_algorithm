@@ -1,6 +1,7 @@
 from enum import Enum
 
-default_values = [60, 0.5, 0.02, 0, 10, -10, 10, 6, 100, 1000]
+binary_default_values = [60, 0.5, 0.02, 0, 10, -10, 10, 6, 100, 1000]
+real_default_values = [60, 0.5, 0.02, 10, 0, 0, -10, 10, 100, 1000]
 
 
 class OptimizationType(Enum):
@@ -27,7 +28,7 @@ class Mutation(Enum):
     TWO_POINT = 'two-point'
 
 
-class Variables(Enum):
+class BinaryVariables(Enum):
     SELECTION_PERCENTAGE = 'selection percentage / tournament size:'
     CROSS_PROBABILITY = 'cross prob:'
     MUTATION_PROBABILITY = 'mutation prob:'
@@ -37,6 +38,20 @@ class Variables(Enum):
     LEFT_INTERVAL_ENDPOINT = 'left interval endpoint:'
     RIGHT_INTERVAL_ENDPOINT = 'right interval endpoint:'
     CHROMOSOME_PRECISION = 'chromosome precision:'
+    POPULATION_SIZE = 'population size:'
+    EPOCH_AMOUNT = 'epoch amount:'
+
+
+class RealVariables(Enum):
+    SELECTION_PERCENTAGE = 'selection percentage / tournament size:'
+    CROSS_PROBABILITY = 'cross prob:'
+    MUTATION_PROBABILITY = 'mutation prob:'
+    PERCENTAGE_ELITE = 'percentage elite:'
+    ALPHA = 'alpha:'
+    BETA = 'beta:'
+
+    LEFT_INTERVAL_ENDPOINT = 'left interval endpoint:'
+    RIGHT_INTERVAL_ENDPOINT = 'right interval endpoint:'
     POPULATION_SIZE = 'population size:'
     EPOCH_AMOUNT = 'epoch amount:'
 

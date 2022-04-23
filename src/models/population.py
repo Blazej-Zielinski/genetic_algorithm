@@ -1,14 +1,14 @@
 import math
 import numpy as np
 import random
+from abc import ABC
 from functools import cmp_to_key
 from src.models.member import Member
 from src.utils.utils import compare_members
 from src.algorithm.conf import OptimizationType
 
 
-# TODO find way to separate methods for real and classic chromosomes
-class Population:
+class Population(ABC):
     def __init__(self, interval, precision, chromosome_type, size, optimization):
         self.size = size
         self.members = [Member(interval, precision, chromosome_type) for _ in range(self.size)]
@@ -23,10 +23,8 @@ class Population:
         return Member(self.interval, self.precision, self.chromosome_type)
 
     def best_selection(self, percentage: int):
-        if not (100 >= percentage >= 0):
-            return
-
-        result = sorted(self.members, key=cmp_to_key(compare_members), reverse=OptimizationType.MAXIMIZATION.value == self.optimization)
+        result = sorted(self.members, key=cmp_to_key(compare_members),
+                        reverse=OptimizationType.MAXIMIZATION.value == self.optimization)
         number_of_selected_members = math.ceil(self.size * percentage / 100)
 
         self.members = result[:number_of_selected_members]
@@ -68,6 +66,132 @@ class Population:
 
         self.members = winners
         return winners
+
+    def elite_strategy(self, percentage: int):
+        # Nr of elite members
+        elite_members_nr = math.ceil(self.size * (percentage / 100))
+        sorted_members = sorted(self.members, key=cmp_to_key(compare_members),
+                                reverse=OptimizationType.MAXIMIZATION.value == self.optimization)
+
+        # Delete elite members from self.members
+        self.members = [member for member in self.members if member not in sorted_members[:elite_members_nr]]
+
+        return sorted_members[:elite_members_nr]
+
+
+class PopulationReal(Population):
+    def __init__(self, interval, precision, chromosome_type, size, optimization):
+        super().__init__(interval, precision, chromosome_type, size, optimization)
+
+    def arithmetic_crossover(self, parent1: Member, parent2: Member, probability: float):
+        if random.random() >= probability:
+            return []
+
+        child1 = self.create_child()
+        child1.chromosomes[0].value = probability * parent1.chromosomes[0].value + (1 - probability) * \
+                                      parent2.chromosomes[0].value
+        child1.chromosomes[1].value = probability * parent1.chromosomes[1].value + (1 - probability) * \
+                                      parent2.chromosomes[1].value
+
+        child2 = self.create_child()
+        child2.chromosomes[0].value = (1 - probability) * parent1.chromosomes[0].value + probability * \
+                                      parent2.chromosomes[0].value
+        child2.chromosomes[1].value = (1 - probability) * parent1.chromosomes[1].value + probability * \
+                                      parent2.chromosomes[1].value
+
+        child1.update_fitness_value()
+        child2.update_fitness_value()
+
+        return child1, child2
+
+    def blend_crossover(self, parent1: Member, parent2: Member, probability: float, alpha: float, beta: float = None):
+        if random.random() >= probability:
+            return []
+
+        children = [self.create_child() for _ in range(2)]
+        beta = beta if beta is not None else alpha
+
+        for child in children:
+            dx = abs(parent1.chromosomes[0].value - parent2.chromosomes[0].value)
+            dy = abs(parent1.chromosomes[1].value - parent2.chromosomes[1].value)
+
+            while True:
+                child.chromosomes[0].value = random.uniform(
+                    min(parent1.chromosomes[0].value, parent2.chromosomes[0].value) - alpha * dx,
+                    max(parent1.chromosomes[0].value, parent2.chromosomes[0].value) + beta * dx)
+
+                child.chromosomes[1].value = random.uniform(
+                    min(parent1.chromosomes[1].value, parent2.chromosomes[1].value) - alpha * dy,
+                    max(parent1.chromosomes[1].value, parent2.chromosomes[1].value) + beta * dy)
+
+                child.update_fitness_value()
+                if child.chromosomes[0].is_value_in_interval() and child.chromosomes[1].is_value_in_interval():
+                    break
+
+        return children
+
+    def average_crossover(self, parent1: Member, parent2: Member, probability: float):
+        if not random.random() <= probability:
+            return []
+
+        child = self.create_child()
+        for idx, chromosome in enumerate(child.chromosomes):
+            chromosome.value = (parent1.chromosomes[idx].value + parent2.chromosomes[idx].value) / 2
+
+        child.update_fitness_value()
+        return [child]
+
+    def linear_crossover(self, parent1: Member, parent2: Member, probability: float):
+        if not random.random() <= probability:
+            return []
+
+        children = [self.create_child() for _ in range(3)]
+        factors = [
+            [[0.5, 0.5], [0.5, 0.5]],
+            [[1.5, -0.5], [1.5, -0.5]],
+            [[-0.5, 1.5], [-0.5, 1.5]]
+        ]
+
+        for i, child in enumerate(children):
+            for j, chromosome in enumerate(child.chromosomes):
+                chromosome.value = factors[i][j][0] * parent1.chromosomes[j].value + factors[i][j][1] * \
+                                   parent2.chromosomes[j].value
+            child.update_fitness_value()
+
+        filtered_children = list(
+            filter(lambda r: r.chromosomes[0].is_value_in_interval() and r.chromosomes[1].is_value_in_interval(),
+                   children))
+        if len(filtered_children) < 2:
+            return []
+
+        result = sorted(filtered_children, key=cmp_to_key(compare_members),
+                        reverse=OptimizationType.MAXIMIZATION.value == self.optimization)[:2]
+
+        return result[:2]
+
+    def uniform_mutation(self, member: Member, probability: float):
+        if not random.random() <= probability:
+            return
+
+        index_to_update = random.randint(0, 1)
+        member.chromosomes[index_to_update].value = random.uniform(self.interval[0], self.interval[1])
+        member.update_fitness_value()
+
+    def gauss_mutation(self, member: Member, probability: float):
+        if not random.random() <= probability:
+            return
+
+        n_distribution = np.random.normal()
+        if (self.interval[0] <= member.chromosomes[0].value + n_distribution <= self.interval[1]) and (
+                self.interval[0] <= member.chromosomes[1].value + n_distribution <= self.interval[1]):
+            for chromosome in member.chromosomes:
+                chromosome.value += n_distribution
+            member.update_fitness_value()
+
+
+class PopulationBinary(Population):
+    def __init__(self, interval, precision, chromosome_type, size, optimization):
+        super().__init__(interval, precision, chromosome_type, size, optimization)
 
     def multipoint_crossover(self, parent1: Member, parent2: Member, probability: float, crossover_points_number: int):
         if not (1 >= probability >= 0):
@@ -170,16 +294,3 @@ class Population:
                 member.chromosomes[i].binary_arr[inversion_point] ^= 1
 
         member.update_fitness_value()
-
-    def elite_strategy(self, percentage: int):
-        if percentage > 100 or percentage <= 0:
-            return []
-
-        # Nr of elite members
-        elite_members_nr = math.ceil(self.size * (percentage / 100))
-        sorted_members = sorted(self.members, key=cmp_to_key(compare_members), reverse=OptimizationType.MAXIMIZATION.value == self.optimization)
-
-        # Delete elite members from self.members
-        self.members = [member for member in self.members if member not in sorted_members[:elite_members_nr]]
-
-        return sorted_members[:elite_members_nr]
