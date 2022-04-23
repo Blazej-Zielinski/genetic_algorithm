@@ -1,6 +1,9 @@
 import tkinter as tk
-from src.algorithm.conf import Crossover, Mutation, Selection, Variables, Config, GenAlgorithms, default_values, OptimizationType
-from src.algorithm.algorithm import Algorithm
+from src.algorithm.conf import RealCrossover, BinaryCrossover, RealMutation, BinaryMutation, \
+    Selection, BinaryVariables, RealVariables, Config, GenOperators, binary_default_values, real_default_values, \
+    OptimizationType
+from src.algorithm.algorithm import RealAlgorithm, BinaryAlgorithm
+from src.models.chromosome import ChromosomeType
 
 
 class GeneticAlgorithmInterface(tk.Frame):

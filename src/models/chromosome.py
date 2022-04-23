@@ -6,7 +6,7 @@ from enum import Enum
 
 
 class ChromosomeType(Enum):
-    CLASSIC = 'classic chromosome'
+    BINARY = 'binary chromosome'
     REAL = 'real chromosome'
 
 
@@ -17,7 +17,7 @@ class Chromosome(ABC):
         pass
 
 
-class ClassicChromosome(Chromosome):
+class BinaryChromosome(Chromosome):
     def __init__(self, interval, precision):
         self.interval = interval
         self.precision = precision
@@ -40,9 +40,12 @@ class RealChromosome(Chromosome):
     def calculate_value(self):
         return self.value
 
+    def is_value_in_interval(self):
+        return self.interval[0] <= self.value <= self.interval[1]
+
 
 def create_chromosome(chromosome_type: ChromosomeType, interval, precision=6):
-    if ChromosomeType.CLASSIC == chromosome_type:
-        return ClassicChromosome(interval, precision)
+    if ChromosomeType.BINARY == chromosome_type:
+        return BinaryChromosome(interval, precision)
     elif ChromosomeType.REAL == chromosome_type:
         return RealChromosome(interval)

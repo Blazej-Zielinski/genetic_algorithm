@@ -194,8 +194,6 @@ class PopulationBinary(Population):
         super().__init__(interval, precision, chromosome_type, size, optimization)
 
     def multipoint_crossover(self, parent1: Member, parent2: Member, probability: float, crossover_points_number: int):
-        if not (1 >= probability >= 0):
-            return
         if random.random() >= probability:
             return []
 
@@ -226,9 +224,6 @@ class PopulationBinary(Population):
         return child1, child2
 
     def homogeneous_crossover(self, parent1: Member, parent2: Member, probability: float):
-        if not (1 >= probability >= 0):
-            return
-
         child1, child2 = self.create_child(), self.create_child()
 
         for i in range(parent1.chromosomes.size):
@@ -250,9 +245,6 @@ class PopulationBinary(Population):
         return child1, child2
 
     def boundary_mutation(self, member: Member, probability: float):
-        if not (1 >= probability >= 0):
-            return
-
         for i in range(0, member.chromosomes.size):
             which_boundary = random.randint(0, 1)
 
@@ -265,9 +257,6 @@ class PopulationBinary(Population):
         member.update_fitness_value()
 
     def multipoint_mutation(self, member: Member, probability: float, mutation_points_number: int):
-        if not (1 >= probability >= 0):
-            return
-
         for i in range(0, member.chromosomes.size):
             mutation_points = sorted(np.random.choice(
                 np.arange(0, member.chromosomes[i].binary_arr.size - 1),
