@@ -10,7 +10,7 @@ class GeneticAlgorithmInterface(tk.Frame):
     def __init__(self, main):
         super().__init__(main)
         self.__main_window = main
-        self.__main_window.geometry('400x420')
+        self.__main_window.geometry('400x450')
         self.__main_window.resizable(False, False)
         self.__main_window.title("Genetic Algorithm")
         self.start()
@@ -39,7 +39,7 @@ class GeneticAlgorithmInterface(tk.Frame):
         optimization_enum = [e.value for e in OptimizationType]
         selection_enum = [e.value for e in Selection]
         cross_enum = [e.value for e in (RealCrossover if chromosome_type == ChromosomeType.REAL else BinaryCrossover)]
-        mutation_enum = [e.value for e in (RealMutation if chromosome_type == ChromosomeType.REAL else RealMutation)]
+        mutation_enum = [e.value for e in (RealMutation if chromosome_type == ChromosomeType.REAL else BinaryMutation)]
 
         dropdown_variables = [optimization_enum, selection_enum, mutation_enum, cross_enum]
 
@@ -75,28 +75,28 @@ class GeneticAlgorithmInterface(tk.Frame):
 
 
 def configure_and_start_algorithm(variables, chromosome_type):
-    # try:
-    config = Config().with_optimization(variables[GenOperators.OPTIMIZATION.value]) \
-            .with_epoch_amount(variables[BinaryVariables.EPOCH_AMOUNT.value]) \
-            .with_population_size(variables[BinaryVariables.POPULATION_SIZE.value]) \
-            .with_elite_strategy(variables[BinaryVariables.PERCENTAGE_ELITE.value]) \
-            .with_interval(variables[BinaryVariables.LEFT_INTERVAL_ENDPOINT.value],
-                           variables[BinaryVariables.RIGHT_INTERVAL_ENDPOINT.value]) \
-            .with_crossover(variables[GenOperators.CROSSOVER.value],
-                            variables[BinaryVariables.CROSS_PROBABILITY.value]) \
-            .with_mutation(variables[GenOperators.MUTATION.value],
-                           variables[BinaryVariables.MUTATION_PROBABILITY.value]) \
-            .with_selection(variables[GenOperators.SELECTION.value],
-                            variables[BinaryVariables.SELECTION_PERCENTAGE.value]) \
-            .with_chromosome_type(chromosome_type)
-    if ChromosomeType.BINARY == chromosome_type:
-        config.with_inversion(variables[BinaryVariables.INVERSION_PROBABILITY.value]) \
-            .with_chromosome_prec(variables[BinaryVariables.CHROMOSOME_PRECISION.value])
-    else:
-        config.with_alpha(variables[RealVariables.ALPHA.value]) \
-            .with_beta(variables[RealVariables.BETA.value])
-    # except:
-    #     print("Bad config")
-    #     return
+    try:
+        config = Config().with_optimization(variables[GenOperators.OPTIMIZATION.value]) \
+                .with_epoch_amount(variables[BinaryVariables.EPOCH_AMOUNT.value]) \
+                .with_population_size(variables[BinaryVariables.POPULATION_SIZE.value]) \
+                .with_elite_strategy(variables[BinaryVariables.PERCENTAGE_ELITE.value]) \
+                .with_interval(variables[BinaryVariables.LEFT_INTERVAL_ENDPOINT.value],
+                               variables[BinaryVariables.RIGHT_INTERVAL_ENDPOINT.value]) \
+                .with_crossover(variables[GenOperators.CROSSOVER.value],
+                                variables[BinaryVariables.CROSS_PROBABILITY.value]) \
+                .with_mutation(variables[GenOperators.MUTATION.value],
+                               variables[BinaryVariables.MUTATION_PROBABILITY.value]) \
+                .with_selection(variables[GenOperators.SELECTION.value],
+                                variables[BinaryVariables.SELECTION_PERCENTAGE.value]) \
+                .with_chromosome_type(chromosome_type)
+        if ChromosomeType.BINARY == chromosome_type:
+            config.with_inversion(variables[BinaryVariables.INVERSION_PROBABILITY.value]) \
+                .with_chromosome_prec(variables[BinaryVariables.CHROMOSOME_PRECISION.value])
+        else:
+            config.with_alpha(variables[RealVariables.ALPHA.value]) \
+                .with_beta(variables[RealVariables.BETA.value])
+    except:
+        print("Bad config")
+        return
 
     RealAlgorithm(config).start() if ChromosomeType.REAL == chromosome_type else BinaryAlgorithm(config).start()
